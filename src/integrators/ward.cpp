@@ -10,9 +10,43 @@ namespace pbrt {
 	
 void WardIntegrator::Preprocess(const Scene &scene,
                                 Sampler &sampler) {
+  std::vector<int> nLightSamples;
+  
+  for (const auto &light : scene.lights) {
+    nLightSamples.push_back(sampler.RoundCount(light->nSamples));
+  }
+  
+  // Request samples for sampling all lights
+  for (size_t i = 0; i < scene.lights.size(); ++i) {
+    sampler.Request2DArray(nLightSamples[i]);
+  }
 
-   
-
+  //sample points on the lights and put the resulting point lights in the lightSources vector to make re-ordering them easier later on
+  for (size_t i = 0; i < scene.lights.size(); ++i) {
+    int nSamples = nLightSamples[i];
+    const Point2f *uLightArray = sampler.Get2DArray(nSamples);
+    //if the array wasn't sampled correctly, sample the source normally
+    if(!uLightArray){
+      //store a point on the source
+      LightSource newSource {};
+      newSource.light = &scene.lights[i];
+      newSource.uLight = sampler.Get2D();
+      newSource.sampledCount = 0;
+      newSource.sampleReached = 0;
+      lightSources.push_back(newSource);
+    }
+    else{
+      for (int j = 0; j < nSamples; ++j){
+	//store a point on the source
+	LightSource newSource {};
+	newSource.light = &scene.lights[i];
+	newSource.uLight = uLightArray[j];
+	newSource.sampledCount = 0;
+	newSource.sampleReached = 0;
+	lightSources.push_back(newSource);
+      }
+    }
+  }
 }
 
 Spectrum WardIntegrator::Li(const RayDifferential &ray,

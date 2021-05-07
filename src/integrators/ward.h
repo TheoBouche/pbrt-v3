@@ -23,7 +23,26 @@ class WardIntegrator : public SamplerIntegrator {
     Spectrum Li(const RayDifferential &ray, const Scene &scene,
                 Sampler &sampler, MemoryArena &arena, int depth) const;
 
-    void Preprocess(const Scene &scene, Sampler &sampler);  
+    void Preprocess(const Scene &scene, Sampler &sampler);
+
+  private:
+    //represents a light source as a single point
+    struct LightSource{
+
+      const std::shared_ptr<Light> *light; //light source the point belongs too
+      Point2f uLight; //position of the point on the source
+      //potential contribution for the point being sampled
+      //int nSamples; number of samples requested on the area light the source was sampled, may be implemented later to weight the contribution 
+      int sampledCount; //number of times the source was sampled
+      int sampleReached;//number of times the shadow ray reached the source successfully when sampling
+
+      //TODO : complete once potential contribution is added
+      /*bool operator<(const LightSource& lightSource){
+	return 
+	}*/
+    };
+
+    std::vector<LightSource>lightSources;  
 };
 
 WardIntegrator *CreateWardIntegrator(
