@@ -43,6 +43,7 @@
 #include "geometry.h"
 #include "rng.h"
 #include <inttypes.h>
+#include <iostream>
 
 namespace pbrt {
 
@@ -72,7 +73,39 @@ class Sampler {
 
     // Sampler Public Data
     const int64_t samplesPerPixel;
-
+    
+    void print() {
+    	std::cout << "debut description :"<<"\n\n";
+    	std::cout << "current pixel : " << currentPixel << " currentPixelSampleIndex : " << currentPixelSampleIndex << "\n\n";
+    	std::cout << "array1DOffset : " << array1DOffset << "\n" << "samples1DArraySizes : [";
+    	for(int i = 0; i < samples1DArraySizes.size(); ++i) {
+    	    std::cout << samples1DArraySizes[i] << " ";
+    	}
+    	std::cout << "]\n" << "sampleArray1D : [\n";
+    	for(int i = 0; i < sampleArray1D.size(); ++i) {
+    	    std::cout << "[";
+    	    for(int j = 0; j < sampleArray1D[i].size(); ++j) {
+    	        std::cout << sampleArray1D[i][j] << " ";
+    	    }
+    	    std::cout << "]\n";
+    	}
+  	std::cout << "]\n\n";
+  	
+  	std::cout << "array2DOffset : " << array2DOffset << "\n" << "samples2DArraySizes : [";
+  	for(int i = 0; i < samples2DArraySizes.size(); ++i) {
+    	    std::cout << samples2DArraySizes[i] << " ";
+    	}
+    	std::cout << "]\n" << "sampleArray2D : [\n";
+    	for(int i = 0; i < sampleArray2D.size(); ++i) {
+    	    std::cout << "[";
+    	    for(int j = 0; j < sampleArray2D[i].size(); ++j) {
+    	        std::cout << sampleArray2D[i][j] << " ";
+    	    }
+    	    std::cout << "]\n";
+    	}
+  	std::cout << "]\n\n";
+    }
+    
   protected:
     // Sampler Protected Data
     Point2i currentPixel;

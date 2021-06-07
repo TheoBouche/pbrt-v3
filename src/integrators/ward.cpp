@@ -12,11 +12,8 @@ void WardIntegrator::Preprocess(const Scene &scene,
                                 Sampler &sampler) {
   std::vector<int> nLightSamples;
   //create a new instance of the sampler for sampling during preprocess
-  std::unique_ptr<Sampler> preSampler = sampler.Clone(1);
+  std::unique_ptr<Sampler> preSampler = sampler.Clone(0);
   //initialize the sampler (the point used is not important in this case)
-  Point2i pixel(0.0, 0.0);
-  preSampler->StartPixel(pixel);
-  preSampler->GetCameraSample(pixel);
   
   for (const auto &light : scene.lights) {
     nLightSamples.push_back(preSampler->RoundCount(light->nSamples));
@@ -25,7 +22,10 @@ void WardIntegrator::Preprocess(const Scene &scene,
   //Request samples for sampling all lights
   for (size_t i = 0; i < scene.lights.size(); ++i) {
     preSampler->Request2DArray(nLightSamples[i]);
-    }
+  }
+  Point2i pixel(0.0, 0.0);
+  preSampler->StartPixel(pixel);
+  preSampler->GetCameraSample(pixel);
   //sample points on the lights and put the resulting point lights in the lightSources vector to make re-ordering them easier later on
   for (size_t i = 0; i < scene.lights.size(); ++i) {
     int nSamples = nLightSamples[i];
@@ -72,14 +72,11 @@ Spectrum WardIntegrator::Li(const RayDifferential &ray,
   Vector3f wo = isect.wo;
   L += isect.Le(wo);
   if (lightSources.size() > 0) {
-    //if (scene.lights.size() >0){
     for(int i = 0; i<lightSources.size();++i){
-      //for(int i = 0; i < scene.lights.size();++i){
       Vector3f wi;
       Float lightPdf = 0;
       VisibilityTester visibility;
       Point2f uLight = sampler.Get2D();
-      //Spectrum Li = scene.lights[i]->Sample_Li(isect, uLight, &wi, &lightPdf, &visibility);
       Spectrum Li = (*lightSources[i].light)->Sample_Li(isect, lightSources[i].uLight, &wi, &lightPdf, &visibility); //TODO : try to work out a more elegant way to work with Shared_ptr
       if (lightPdf > 0 && !Li.IsBlack()) {
 	//compute the BSDF
