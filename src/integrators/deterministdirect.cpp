@@ -60,6 +60,7 @@ Spectrum DeterministDirectIntegrator::Li(const RayDifferential &ray,
   SurfaceInteraction isect;
   //if no intersection found, consider that there is no incoming light (not considering environment maps)
   if (!scene.Intersect(ray, &isect)) {
+    for (const auto &light : scene.lights) L += light->Le(ray);
     return L;
   }
 
