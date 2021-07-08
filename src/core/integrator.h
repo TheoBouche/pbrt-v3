@@ -105,6 +105,39 @@ class SamplerIntegrator : public Integrator {
     const Bounds2i pixelBounds;
 };
 
+  
+// SamplerIntegratorBis Declarations (mostly the same as samplerIntegrator but remove the const on the methods)
+class SamplerIntegratorBis : public Integrator {
+  public:
+    // SamplerIntegratorBis Public Methods
+    SamplerIntegratorBis(std::shared_ptr<const Camera> camera,
+                      std::shared_ptr<Sampler> sampler,
+                      const Bounds2i &pixelBounds)
+        : camera(camera), sampler(sampler), pixelBounds(pixelBounds) {}
+    virtual void Preprocess(const Scene &scene, Sampler &sampler) {}
+    void Render(const Scene &scene);
+    virtual Spectrum Li(const RayDifferential &ray, const Scene &scene,
+                        Sampler &sampler, MemoryArena &arena,
+                        int depth = 0) = 0;
+    Spectrum SpecularReflect(const RayDifferential &ray,
+                             const SurfaceInteraction &isect,
+                             const Scene &scene, Sampler &sampler,
+                             MemoryArena &arena, int depth);
+    Spectrum SpecularTransmit(const RayDifferential &ray,
+                              const SurfaceInteraction &isect,
+                              const Scene &scene, Sampler &sampler,
+                              MemoryArena &arena, int depth);
+
+  protected:
+    // SamplerIntegratorBis Protected Data
+    std::shared_ptr<const Camera> camera;
+
+  private:
+    // SamplerIntegratorBis Private Data
+    std::shared_ptr<Sampler> sampler;
+    const Bounds2i pixelBounds;
+};
+
 }  // namespace pbrt
 
 #endif  // PBRT_CORE_INTEGRATOR_H

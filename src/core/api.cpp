@@ -61,6 +61,7 @@
 #include "integrators/volpath.h"
 #include "integrators/whitted.h"
 #include "integrators/deterministdirect.h"
+#include "integrators/ward.h"
 #include "lights/diffuse.h"
 #include "lights/distant.h"
 #include "lights/goniometric.h"
@@ -1694,6 +1695,8 @@ Integrator *RenderOptions::MakeIntegrator() const {
         integrator = CreateSPPMIntegrator(IntegratorParams, camera);
     } else if (IntegratorName == "deterministdirect") {
         integrator = CreateDeterministDirectIntegrator(IntegratorParams, sampler, camera);
+    } else if (IntegratorName == "ward") {
+        integrator = CreateWardIntegrator(IntegratorParams, sampler, camera);
     } else {
         Error("Integrator \"%s\" unknown.", IntegratorName.c_str());
         return nullptr;
